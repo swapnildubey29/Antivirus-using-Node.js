@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: #2c3e50;
+        }
+
+        form {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        input[type="file"] {
+            margin-bottom: 15px;
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        #uploadStatus {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        .success {
+            color: green;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Upload and Scan File</h1>
+
+    <form id="fileUploadForm" enctype="multipart/form-data">
+        <input type="file" name="file" id="fileInput" />
+        <button type="submit">Submit</button>
+    </form>
+    <div id="uploadStatus"></div>
+
+    <script>
+        document.getElementById("fileUploadForm").addEventListener('submit', async (event) => {
+            event.preventDefault()
+
+            const fileInput = document.getElementById('fileInput')
+            const file = fileInput.files[0]
+
+            if (file.size > 3 * 1024 * 1024) {
+                alert('File size exceeds 3 MB. Please upload a smaller file.');
+                fileInput.value = '';
+            }
+
+            if (!file) {
+                alert("Please select a file to upload.")
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            try {
+                const response = await fetch('/uploadHandler', {
+                    method: "POST",
+                    body: formData,
+                });
+
+                const result = await response.text();
+
+                const uploadStatus = document.getElementById("uploadStatus");
+                if (response.ok) {
+                    uploadStatus.innerText = "File uploaded and scanned successfully!";
+                    uploadStatus.className = "success";
+                } else {
+                    uploadStatus.innerText = `Upload failed: ${result}`;
+                    uploadStatus.className = "error";
+                }
+            } catch (error) {
+                console.error("Error uploading file:", error)
+                document.getElementById("uploadStatus").innerText = "An error occurred.";
+                document.getElementById("uploadStatus").className = "error";
+            }
+        });
+    </script>
+</body>
+
+</html>
