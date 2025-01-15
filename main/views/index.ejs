@@ -91,7 +91,7 @@
             uploadStatus.className = "";
 
             // Check file size limit
-            if (file.size > 3 * 1024 * 1024) {
+            if (file.size > 50 * 1024 * 1024) {
                 alert('File size exceeds 3 MB. Please upload a smaller file.');
                 fileInput.value = '';
                 return;

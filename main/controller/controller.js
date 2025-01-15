@@ -52,17 +52,30 @@ const scanFileForVirus = (filePath) => {
 }
 
 const isValidFile = (inputFile) => {
-
   const headers = {
     pdf: [0x25, 0x50, 0x44, 0x46], 
-    jpg: [0xFF, 0xD8, 0xFF],
+    jpg: [0xFF, 0xD8, 0xFF], 
+    jpeg: [0xFF, 0xD8, 0xFF],
+    png: [0x89, 0x50, 0x4E, 0x47], 
+    csv: [0xEF, 0xBB, 0xBF], 
+    xlsx: [0x50, 0x4B, 0x03, 0x04], 
+    docx: [0x50, 0x4B, 0x03, 0x04],
+    exe: [0x4D, 0x5A], 
+    html: [0x3C, 0x21, 0x44, 0x4F], 
+    xml: [0x3C, 0x3F, 0x78, 0x6D], 
+    zip: [0x50, 0x4B, 0x03, 0x04], 
   }
 
-  if (inputFile[0] === headers.pdf[0] && inputFile[1] === headers.pdf[1]) {
-    return true
+  const checkMagicNumber = (header) => {
+    for (const [key, value] of Object.entries(headers)) {
+      if (header.slice(0, value.length).every((byte, index) => byte === value[index])) {
+        return true
+      }
+    }
+    return false
   }
 
-  return false 
+  return checkMagicNumber(inputFile)
 }
 
 const validateFile = (filePath) => {
