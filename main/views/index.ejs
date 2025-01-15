@@ -80,23 +80,34 @@
 
     <script>
         document.getElementById("fileUploadForm").addEventListener('submit', async (event) => {
-            event.preventDefault()
+            event.preventDefault();
 
-            const fileInput = document.getElementById('fileInput')
-            const file = fileInput.files[0]
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            const uploadStatus = document.getElementById("uploadStatus");
 
+            // Clear previous messages
+            uploadStatus.innerText = "";
+            uploadStatus.className = "";
+
+            // Check file size limit
             if (file.size > 3 * 1024 * 1024) {
                 alert('File size exceeds 3 MB. Please upload a smaller file.');
                 fileInput.value = '';
+                return;
             }
 
+            // Check if file is selected
             if (!file) {
-                alert("Please select a file to upload.")
+                alert("Please select a file to upload.");
                 return;
             }
 
             const formData = new FormData();
             formData.append("file", file);
+
+            uploadStatus.innerText = "In Progress...";
+            uploadStatus.className = "";
 
             try {
                 const response = await fetch('/uploadHandler', {
@@ -106,18 +117,23 @@
 
                 const result = await response.text();
 
-                const uploadStatus = document.getElementById("uploadStatus");
                 if (response.ok) {
                     uploadStatus.innerText = "File uploaded and scanned successfully!";
                     uploadStatus.className = "success";
+                } else if (result.includes("File is corrupted")) {
+                    uploadStatus.innerText = "The file is corrupted and cannot be processed.";
+                    uploadStatus.className = "error";
+                } else if (result.includes("File is infected")) {
+                    uploadStatus.innerText = "The file is infected and was rejected.";
+                    uploadStatus.className = "error";
                 } else {
-                    uploadStatus.innerText = `Upload failed: ${result}`;
+                    uploadStatus.innerText = "The file is infected and was rejected.";
                     uploadStatus.className = "error";
                 }
             } catch (error) {
-                console.error("Error uploading file:", error)
-                document.getElementById("uploadStatus").innerText = "An error occurred.";
-                document.getElementById("uploadStatus").className = "error";
+                console.error("Error uploading file:", error);
+                uploadStatus.innerText = "An error occurred during the file upload.";
+                uploadStatus.className = "error";
             }
         });
     </script>
