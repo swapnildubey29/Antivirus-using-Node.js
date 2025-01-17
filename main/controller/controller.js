@@ -20,7 +20,7 @@ const scanFileForVirus = (filePath) => {
 
       if (inputFile.length === 0) {
         throw new Error("File buffer is empty. Possible corruption.")
-      }
+      } 
 
       console.log("File buffer size:", inputFile.length)
 
@@ -30,7 +30,7 @@ const scanFileForVirus = (filePath) => {
 
       apiInstance.scanFile(inputFile, (error, data) => {
         if (error) {
-          console.error("Antivirus scan error:", error)
+           console.error("Antivirus scan error:", error)   
           return reject("Antivirus scan failed.")
         }
 
